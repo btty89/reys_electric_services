@@ -40,9 +40,7 @@ class OrderController extends Controller
     //  guardar presupuesto
     public function store(Request $request)
     {
-      //  dd($request->all());
-
-        DB::transaction(function () use ($request) {
+       DB::transaction(function () use ($request) {
 
             $order = Order::create([
                 'customer' => $request->customer,

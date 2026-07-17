@@ -1,84 +1,65 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="card shadow-sm">
 
-<div class="card shadow-sm">
+        <div class="card-header bg-white">
 
-    <div class="card-header bg-white">
+            <h4>Adicionar Servicio</h4>
 
-        <h4>Adicionar Servicio</h4>
+        </div>
 
-    </div>
+        <div class="card-body">
 
-    <div class="card-body">
+            <form method="POST" action="{{ route('services.store') }}">
+                @csrf
 
-        <form
-            method="POST"
-            action="{{ route('services.store')}}"
-        >
-            @csrf
-
-             @if (request('return')) 
+                @if (request('return'))
                     <input type="hidden" name="return" value="{{ request('return') }}">
                 @endif
-          
-            <div class="mb-3">
 
-                <label>Nombre</label>
+                <div class="mb-3">
 
-                <input
-                    type="text"
-                    name="name"
-                    class="form-control"                   
-                >
+                    <label>Nombre</label>
 
-            </div>
+                    <input type="text" name="name" class="form-control">
 
-            <div class="mb-3">
+                </div>
 
-                <label>Descripción</label>
+                <div class="mb-3">
 
-                <textarea
-                    name="description"
-                    class="form-control"
-                ></textarea>
+                    <label>Descripción</label>
 
-            </div>
+                    <textarea name="description" class="form-control"></textarea>
 
-            <div class="mb-3">
+                </div>
 
-                <label>Precio</label>
+                <div class="mb-3">
 
-                <input
-                    type="number"
-                    step="0.01"
-                    name="price"
-                    class="form-control"                  
-                >
+                    <label>Precio</label>
 
-            </div>
+                    <input type="number" step="0.01" name="price" class="form-control">
 
-            <div class="mt-4 d-flex gap-2">
+                </div>
 
-                <button class="btn btn-primary">
+                <div class="mt-4 d-flex gap-2">
 
-                    Salvar
+                    <button class="btn btn-primary">
 
-                </button>
+                        Salvar
 
-                <a
-                    href="{{ route('services.index') }}"
-                    class="btn btn-secondary"
-                >
-                    Cancelar
-                </a>
+                    </button>
 
-            </div>
+                    <a href="{{ request('return') == 'order' ? route('orders.create') : route('services.index') }}"
+                        class="btn btn-secondary">
+                        Cancelar
+                    </a>
 
-        </form>
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
-
-</div>
-
 @endsection

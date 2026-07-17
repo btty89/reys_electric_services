@@ -14,7 +14,7 @@
             <form method="POST" action="{{ route('products.store') }}">
 
                 @csrf
-                @if (request('return')) 
+                @if (request('return'))
                     <input type="hidden" name="return" value="{{ request('return') }}">
                 @endif
 
@@ -88,7 +88,12 @@
 
                     </button>
 
-                    <a href="{{ url('/products') }}" class="btn btn-secondary">
+                    {{-- <a href="{{ url('/products') }}" class="btn btn-secondary">
+                        Cancelar
+                    </a> --}}
+
+                    <a href="{{ request('return') == 'order' ? route('orders.create') : route('products.index') }}"
+                        class="btn btn-secondary">
                         Cancelar
                     </a>
 

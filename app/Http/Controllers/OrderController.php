@@ -40,6 +40,7 @@ class OrderController extends Controller
     //  guardar presupuesto
     public function store(Request $request)
     {
+      //  dd($request->all());
 
         DB::transaction(function () use ($request) {
 
@@ -48,8 +49,6 @@ class OrderController extends Controller
                 'total' => 0,
                 'total_products' => 0,
                 'total_services' => 0,
-                'discount_services_percent' => 0,
-                'discount_services_value' => 0,
             ]);
 
             foreach ($request->products as $item) {
@@ -61,19 +60,20 @@ class OrderController extends Controller
                     'subtotal' => $item['quantity'] * $item['price'],
                 ]);
             }
+                foreach ($request->services as $item) {
 
-            foreach ($request->services as $item) {
                 $subtotal = $item['quantity'] * $item['price'];
 
-                $discountValue =
-                    ($subtotal * ($item['discount'] ?? 0)) / 100;
+                $discountPercent = $item['discount'] ?? 0;
+
+                $discountValue = ($subtotal * $discountPercent) / 100;
 
                 OrderService::create([
-                    'order_id' => $order->id,
-                    'service_id' => $item['id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'discount_percent' => $item['discount'] ?? 0,
+                    'order_id'         => $order->id,
+                    'service_id'       => $item['id'],
+                    'quantity'         => $item['quantity'],
+                    'price'            => $item['price'],
+                    'discount_percent' => $discountPercent,
                     'discount_value'   => $discountValue,
                     'subtotal'         => $subtotal - $discountValue,
                 ]);
@@ -83,16 +83,10 @@ class OrderController extends Controller
             $totalProducts = $order->orderProducts()->sum('subtotal');
             $totalServices = $order->orderServices()->sum('subtotal');
 
-            // Descuento
-            $discountPercent = $request->discount_services_percent ?? 0;
-            $discountValue = ($totalServices * $discountPercent) / 100;
-
             $order->update([
                 'total_products' => $totalProducts,
-                'total_services' => $totalServices,
-                'discount_services_percent' => $discountPercent,
-                'discount_services_value' => $discountValue,
-                'total' => $totalProducts + ($totalServices - $discountValue),
+                'total_services' => $totalServices,              
+                'total' => $totalProducts + $totalServices
 
             ]);
         });
@@ -179,7 +173,7 @@ class OrderController extends Controller
 
     public function pdf(Order $order)
     {
-    
+
         $order->load([
             'orderProducts.product',
             'orderServices.service'
@@ -189,7 +183,7 @@ class OrderController extends Controller
 
         $pdf = Pdf::loadView(
             'orders.pdf',
-            compact('order','totalDiscount')
+            compact('order', 'totalDiscount')
         );
 
         /* return $pdf->download(
